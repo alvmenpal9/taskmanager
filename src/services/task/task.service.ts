@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import mongoose, { Model } from 'mongoose';
@@ -47,11 +47,45 @@ export class TaskService {
                 status: status
             });
 
-            if(!taskFound) throw new HttpException(`Could not update task status`, HttpStatus.NOT_FOUND);
+            if (!taskFound) throw new HttpException(`Could not update task status`, HttpStatus.NOT_FOUND);
 
-            return{
+            return {
                 status: 200,
                 message: 'Task updated'
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async retrieveUserTasks(req: Request, username: string) {
+        if(req?.user['username'] !== username) throw new UnauthorizedException;
+
+        try {
+            const tasks = await this.Task.aggregate([
+                {
+                    $lookup: {from:'users', localField: 'user', foreignField: '_id', as: 'User'}
+                },{
+                    $unwind: '$User'
+                },{
+                    $match: {'User.username':username}
+                },{
+                    $project: {'User.password':0, 'user':0}
+                }
+            ]);
+            return tasks
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async deleteTask(taskId:string, req:Request){
+        if(taskId.length !== 24) throw new HttpException(`Invalid ID`, HttpStatus.NOT_FOUND);
+        try {
+            const userId = new mongoose.Types.ObjectId(req.user['sub']);
+            const deletedTask = await this.Task.findOneAndDelete({_id:taskId, user:userId});
+            if(deletedTask){
+                return HttpStatus.OK;
             }
         } catch (error) {
             throw error

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Request } from 'express';
 import { CreateTaskDto } from 'src/dto/task/create_task.dto';
 import { UpdateTaskDtio } from 'src/dto/task/update_task.dto';
@@ -25,6 +25,16 @@ export class TaskController {
     @UsePipes(ValidationPipe)
     changeStatus(@Param() params, @Body() dto:UpdateTaskDtio, @Req() req:Request){
         return this.taskService.changeTaskStatus(params.id, dto, req);
+    }
+
+    @Get(':username')
+    retrieveUserTasks(@Req() req:Request, @Param() params){
+        return this.taskService.retrieveUserTasks(req, params?.username);
+    }
+
+    @Delete(':id')
+    deleteTask(@Param() params, @Req() req:Request){
+        return this.taskService.deleteTask(params.id, req);
     }
 
 }
