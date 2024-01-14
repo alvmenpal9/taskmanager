@@ -20,6 +20,7 @@ export class UserController {
         return this.userService.getUserById(params.id);
     }
 
+    @PublicAccess()
     @Post()
     @UsePipes(ValidationPipe)
     createUser(@Body() userDto:UserCreateDto){

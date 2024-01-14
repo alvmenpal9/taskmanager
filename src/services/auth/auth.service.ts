@@ -33,8 +33,8 @@ export class AuthService {
             role: userFound.role
         }
 
-        const refreshToken = this.signJwt(payload, process.env.REFRESH_TOKEN, '30m');
-        const accessToken = this.signJwt(payload, process.env.ACCESS_TOKEN, '1h');
+        const accessToken = this.signJwt(payload, process.env.ACCESS_TOKEN, '30m');
+        const refreshToken = this.signJwt(payload, process.env.REFRESH_TOKEN, '1h');
 
         response.cookie('jwt', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
