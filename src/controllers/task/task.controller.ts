@@ -32,6 +32,11 @@ export class TaskController {
         return this.taskService.retrieveUserTasks(req, params?.username);
     }
 
+    @Delete('removeCompleted')
+    removeCompletedTasks(@Req() req:Request){
+        return this.taskService.deleteCompletedTasks(req);
+    }
+
     @Delete(':id')
     deleteTask(@Param() params, @Req() req:Request){
         return this.taskService.deleteTask(params.id, req);

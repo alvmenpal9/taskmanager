@@ -91,4 +91,17 @@ export class TaskService {
             throw error
         }
     }
+
+    async deleteCompletedTasks(req:Request){
+        try {
+            const tasksToRemove = await this.Task.find().deleteMany({status:'completed'});
+            if(tasksToRemove){
+                return {
+                    message: 'Completed tasks deleted'
+                }
+            }
+        } catch (error) {
+            throw error
+        }
+    }
 }
